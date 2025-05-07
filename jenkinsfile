@@ -1,0 +1,94 @@
+pipeline {
+    agent none
+
+    stages {
+        stage('Get Code') {
+            agent {label 'agent1'}
+            steps {
+                bat 'whoami'
+                bat 'hostname'
+                echo "${WORKSPACE}"
+
+
+
+
+                echo 'Con esto se va a traer el código'
+                git 'https://github.com/pablohitos/helloworld-unir.git'
+                bat 'dir'
+
+
+                stash includes: '**', name: 'codigo'
+            }
+        }
+
+        stage('Build') {
+            agent{ label 'agent1'}
+            steps {
+                echo 'En este caso no hay que compilar nada ya que es Python'
+            }
+        }
+
+        stage('Tests') {
+            parallel {
+                stage('Unit') {
+                    agent { label 'agent2' }
+                    steps {
+
+                        bat 'whoami'
+                        bat 'hostname'
+                        echo "${WORKSPACE}"
+
+
+
+                        unstash 'codigo'
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
+                        bat '''
+                        set PYTHONPATH=%WORKSPACE%
+                        pytest --junitxml=result-unit.xml test\\unit
+                        '''
+                        }
+                        stash includes: 'result-unit.xml', name: 'unit-result'
+                        deleteDir()
+                    }
+                }
+
+                stage('Rest') {
+                    agent { label 'agent3' }
+                    steps {
+                        bat 'whoami'
+                        bat 'hostname'
+                        echo "${WORKSPACE}"
+
+
+                        unstash 'codigo'
+                        bat '''
+                        set FLASK_APP=app\\api.py
+                        set FLASK_ENV=development
+                        start flask run
+                        start java -jar C:\\Users\\pablo\\wiremock\\wiremock-standalone-3.4.2.jar --port 9090 --root-dir C:\\Users\\pablo\\wiremock
+                        set PYTHONPATH=%WORKSPACE%
+                        pytest --junitxml=result-rest.xml test\\rest
+                        '''
+
+                        stash includes: 'result-rest.xml', name: 'rest-result'
+                        deleteDir()
+                    }
+                }
+            }
+        }
+
+        stage('Results') {
+            agent { label 'agent1'}
+            steps {
+                unstash 'unit-result'
+                unstash 'rest-result'
+
+
+                echo 'Mostrando resultados de pruebas...'
+                junit 'result-*.xml'
+            }
+        }
+    }
+}
+
+
