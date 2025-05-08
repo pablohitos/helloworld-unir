@@ -13,7 +13,7 @@ pipeline {
 
 
                 echo 'Con esto se va a traer el código'
-                git 'https://github.com/pablohitos/helloworld-unir.git'
+                git branch: 'master', url: 'https://github.com/pablohitos/helloworld-unir.git' 
                 bat 'dir'
 
 
@@ -64,10 +64,15 @@ pipeline {
                         bat '''
                         set FLASK_APP=app\\api.py
                         set FLASK_ENV=development
-                        start flask run
-                        start java -jar C:\\Users\\pablo\\wiremock\\wiremock-standalone-3.4.2.jar --port 9090 --root-dir C:\\Users\\pablo\\wiremock
+                        start /B flask run
+                        timeout /T 5 > NUL
+                        start /B java -jar C:\\Users\\pablo\\wiremock\\wiremock-standalone-3.4.2\\wiremock-standalone-3.4.2.jar --port 9090 --root-dir C:\\Users\\pablo\\wiremock
+                        timeout /T 5 > NUL
                         set PYTHONPATH=%WORKSPACE%
                         pytest --junitxml=result-rest.xml test\\rest
+                        REM Cerrar procesos abiertos
+                        taskkill /F /IM java.exe
+                        taskkill /F /IM flask.exe
                         '''
 
                         stash includes: 'result-rest.xml', name: 'rest-result'
@@ -90,5 +95,3 @@ pipeline {
         }
     }
 }
-
-
