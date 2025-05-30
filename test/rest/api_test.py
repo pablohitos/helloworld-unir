@@ -17,7 +17,7 @@ class TestApi(unittest.TestCase):
 
     def test_api_add(self):
         url = f"{BASE_URL}/calc/add/1/2"
-        response = urlopen(url, timeout=DEFAULT_TIMEOUT)
+        response = urlopen(url, timeout=DEFAULT_TIMEOUT)  # nosec B310
         self.assertEqual(
             response.status, http.client.OK, f"Error en la petición API a {url}"
         )
@@ -27,7 +27,7 @@ class TestApi(unittest.TestCase):
 
     def test_api_sqrt(self):
         url = f"{BASE_URL_MOCK}/calc/sqrt/64"
-        response = urlopen(url, timeout=DEFAULT_TIMEOUT)
+        response = urlopen(url, timeout=DEFAULT_TIMEOUT)  # nosec B310
         self.assertEqual(
             response.status, http.client.OK, f"Error en la petición API a {url}"
         )
