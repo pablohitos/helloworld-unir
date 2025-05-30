@@ -94,4 +94,4 @@ def divide(op_1, op_2):
 
 
 if __name__ == '__main__':
-    api_application.run(debug=True)
+    api_application.run()
