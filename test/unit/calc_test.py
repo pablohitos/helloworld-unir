@@ -34,6 +34,9 @@ class TestCalculate(unittest.TestCase):
         self.assertRaises(TypeError, self.calc.add, 2, None)
         self.assertRaises(TypeError, self.calc.add, object(), 2)
         self.assertRaises(TypeError, self.calc.add, 2, object())
+        
+    def test_add_method_fails_with_both_invalid(self):
+        self.assertRaises(TypeError, self.calc.add, "a", "b")
     
     def test_divide_method_fails_with_nan_parameter(self):
         self.assertRaises(TypeError, self.calc.divide, "2", 2)
@@ -61,10 +64,3 @@ class TestCalculate(unittest.TestCase):
         self.assertEqual(0, self.calc.substract(0, 0))
         self.assertEqual(0, self.calc.substract(0, 0))
         self.assertRaises(TypeError, self.calc.substract, "0", 0)
-
-    def test_invalid_y_type(self):
-        with self.assertRaises(TypeError):
-            self.calc.add(2, "b")
-
-if __name__ == "__main__":
-    unittest.main()
