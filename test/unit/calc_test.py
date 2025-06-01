@@ -61,6 +61,10 @@ class TestCalculate(unittest.TestCase):
         self.assertEqual(0, self.calc.substract(0, 0))
         self.assertEqual(0, self.calc.substract(0, 0))
         self.assertRaises(TypeError, self.calc.substract, "0", 0)
-        
-if __name__ == "__main__":  # pragma: no cover
+
+    def test_invalid_y_type(self):
+        with self.assertRaises(TypeError):
+            self.calc.add(2, "b")
+
+if __name__ == "__main__":
     unittest.main()
